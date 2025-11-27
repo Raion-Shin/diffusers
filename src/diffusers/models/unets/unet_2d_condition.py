@@ -1051,6 +1051,7 @@ class UNet2DConditionModel(
         down_intrablock_additional_residuals: Optional[Tuple[torch.Tensor]] = None,
         encoder_attention_mask: Optional[torch.Tensor] = None,
         return_dict: bool = True,
+        return_intermediate: bool = False,
     ) -> Union[UNet2DConditionOutput, Tuple]:
         r"""
         The [`UNet2DConditionModel`] forward method.
@@ -1263,6 +1264,11 @@ class UNet2DConditionModel(
 
         if is_controlnet:
             sample = sample + mid_block_additional_residual
+
+        if return_intermediate:
+            if not return_dict:
+                return (sample,)
+            return UNet2DConditionOutput(sample=sample)
 
         # 5. up
         for i, upsample_block in enumerate(self.up_blocks):
